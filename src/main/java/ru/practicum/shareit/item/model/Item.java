@@ -18,6 +18,7 @@ public class Item {
     private User owner;
     private ItemRequest request;
 
+
     public Item(long id, String name, String description, boolean available) {
         this.setId(id);
         this.setName(name);

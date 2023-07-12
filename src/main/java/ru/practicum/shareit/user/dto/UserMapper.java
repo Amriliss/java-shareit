@@ -11,10 +11,11 @@ public class UserMapper {
                 user.getEmail(),
                 user.getName());
     }
+
     public static User fromUserDto(UserDto userDto) {
         return new User(userDto.getId(),
                 userDto.getEmail(),
                 userDto.getName());
     }
 
-    }
+}

@@ -7,9 +7,9 @@ import ru.practicum.shareit.user.model.User;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
-@ToString
-@EqualsAndHashCode
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Item {
     private long id;
     private String name;

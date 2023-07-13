@@ -5,15 +5,13 @@ import lombok.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-@EqualsAndHashCode
 public class UserDto {
-
+    @NotNull()
     private Long id;
 
     @NotEmpty(groups = {Marker.OnCreate.class}, message = "Email не может быть пустым")

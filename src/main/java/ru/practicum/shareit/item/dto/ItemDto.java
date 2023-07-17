@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode
 @Builder
 public class ItemDto {
-    @NotNull(groups = {Marker.OnCreate.class})
+    @NotNull()
     private long id;
 
     @NotBlank(groups = {Marker.OnCreate.class})

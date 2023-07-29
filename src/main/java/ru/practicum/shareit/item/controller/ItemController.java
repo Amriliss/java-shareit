@@ -22,25 +22,27 @@ public class ItemController {
     private final ItemService itemService;
     private final CommentService commentService;
 
+
     @PostMapping
     public ItemDto create(@RequestHeader(X_SHARER_USER_ID) Long userId, @Valid @RequestBody ItemDto itemDto) {
         log.info("Добавление вещи", userId);
         return itemService.create(userId, itemDto);
     }
 
+
     @PatchMapping("/{itemId}")
-    public ItemDto update(
-            @RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
+    public ItemDto update(@RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
         log.info("Обновление данных вещи");
         return itemService.update(userId, itemId, itemDto);
     }
 
+
     @GetMapping("/{itemId}")
     public ItemDto get(@RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long itemId) {
         log.info("Получение вещи по id {}", itemId);
-
         return itemService.get(userId, itemId);
     }
+
 
     @GetMapping
     public List<ItemDto> get(@RequestHeader(X_SHARER_USER_ID) Long userId) {
@@ -55,9 +57,9 @@ public class ItemController {
         return itemService.search(userId, text);
     }
 
+
     @PostMapping("/{itemId}/comment")
-    public CommentDto comment(@RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long itemId,
-                              @Valid @RequestBody CommentDto commentDto) {
+    public CommentDto comment(@RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long itemId, @Valid @RequestBody CommentDto commentDto) {
         log.info("Добавление комментария");
         return commentService.comment(userId, itemId, commentDto);
     }

@@ -2,12 +2,11 @@ package ru.practicum.shareit.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.user.dto.Marker;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,33 +17,29 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto createUser(@RequestBody @Validated(Marker.OnCreate.class) UserDto userDto) {
+    public UserDto create(@Valid @RequestBody UserDto userDto){
         log.info("Добавление пользователя");
         return userService.create(userDto);
     }
-
-    @PatchMapping("/{id}")
-    public UserDto updateUser(@PathVariable long id, @RequestBody @Validated(Marker.OnUpdate.class) UserDto userDto) {
+    @PatchMapping("/{userId}")
+    public UserDto update(@PathVariable Long userId, @RequestBody UserDto userDto) {
         log.info("Обновление данных пользователя");
-        return userService.update(id, userDto);
+        return userService.update(userId, userDto);
     }
-
     @GetMapping
-    public List<UserDto> getAllUsers() {
+    public List<UserDto> get() {
         log.info("Получение всех пользователей");
-        return userService.getAll();
+        return userService.get();
+    }
+    @GetMapping("/{userId}")
+    public UserDto get(@PathVariable Long userId) {
+        log.info("Получение пользователя по id {}", userId);
+        return userService.get(userId);
     }
 
-    @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable long id) {
-        log.info("Получение пользователя по id {}", id);
-        return userService.get(id);
+    @DeleteMapping("/{userId}")
+    public void delete(@PathVariable Long userId) {
+        log.info("Удаление пользователя по id {}", userId);
+        userService.delete(userId);
     }
-
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable long id) {
-        log.info("Удаление пользователя по id {}", id);
-        userService.delete(id);
-    }
-
 }

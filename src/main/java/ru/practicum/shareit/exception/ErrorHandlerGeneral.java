@@ -2,49 +2,46 @@ package ru.practicum.shareit.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import javax.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 @Slf4j
-public class ErrorHandler {
+public class ErrorHandlerGeneral {
 
-    @ExceptionHandler(DataNotFoundException.class)
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handlerValidationException(final ValidationException exception) {
+        log.warn("409 {}", exception.getMessage());
+        return new ErrorResponse("Validation error 409", exception.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(final DataNotFoundException e) {
-        log.info("404 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+    public ErrorResponse handlerNotFoundException(final ObjectNotFoundException exception) {
+        log.warn("404 {}", exception.getMessage());
+        return new ErrorResponse("Object not found 404", exception.getMessage());
     }
 
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse methodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        log.info("400 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+    public ErrorResponse handlerInvalidException(InvalidException exception) {
+        log.info("400 {}", exception.getMessage());
+        return new ErrorResponse("Invalid status 400", exception.getMessage());
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse constraintViolationException(final ConstraintViolationException e) {
-        log.info("400 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler({DataExistException.class})
+    public ErrorResponse handlerDataExistException(DataExistException exception) {
+        log.warn(exception.getClass().getSimpleName(), exception);
+        return new ErrorResponse("409 Conflict", exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleAlreadyExistException(final DataAlreadyExistException e) {
-        log.info("409 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowable(final Throwable e) {
-        log.info("500 {}", e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
+    public ErrorResponse handlerDuplicateException(final DuplicateEmailException exception) {
+        log.warn("409 {}", exception.getMessage());
+        return new ErrorResponse("DuplicateEmailException error 409", exception.getMessage());
     }
 }

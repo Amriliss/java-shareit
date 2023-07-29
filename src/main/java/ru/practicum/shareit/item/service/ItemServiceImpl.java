@@ -11,8 +11,8 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.service.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.exception.ItemNotFoundException;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
@@ -52,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
 
         User owner = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));
         Item repoItem = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("item not found"));
-        if (!repoItem.getOwner().getId().equals(owner.getId()))  {
+        if (!repoItem.getOwner().getId().equals(owner.getId())) {
             throw new ItemNotFoundException("item not found");
         }
 
@@ -78,7 +78,9 @@ public class ItemServiceImpl implements ItemService {
         List<CommentDto> commentDtos = commentService.commentDtos(itemId);
         itemDto.setComments(commentDtos);
 
-        if (!user.getId().equals(owner.getId())) {return itemDto;}
+        if (!user.getId().equals(owner.getId())) {
+            return itemDto;
+        }
 
         Optional<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndEndIsBeforeAndStatusIs(
                 itemId, LocalDateTime.now(), Status.APPROVED, SORT_DESC);
@@ -107,7 +109,9 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> get(Long userId) {
         User owner = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));
         List<Item> repoItems = itemRepository.findAllByOwnerId(userId);
-        if (repoItems.isEmpty()) {return new ArrayList<>();}
+        if (repoItems.isEmpty()) {
+            return new ArrayList<>();
+        }
 
         List<ItemDto> itemDtoList = repoItems.stream()
                 .map(ItemMapper::toItemDto)
@@ -157,7 +161,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> search(Long userId, String text) {
         User repoUser = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));
-        if (text.isEmpty()) {return Collections.emptyList();}
+        if (text.isEmpty()) {
+            return Collections.emptyList();
+        }
         List<Item> searchItems = itemRepository.searchAvailableByText(text);
         List<ItemDto> searchItemDto = new ArrayList<>();
         for (Item item : searchItems) {

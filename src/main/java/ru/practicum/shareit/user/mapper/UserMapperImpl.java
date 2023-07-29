@@ -17,43 +17,43 @@ public class UserMapperImpl implements UserMapper {
 
     @Override
     public UserInfoDto toUserInfoDto(User user) {
-        if ( user == null ) {
+        if (user == null) {
             return null;
         }
 
         UserInfoDto.UserInfoDtoBuilder userInfoDto = UserInfoDto.builder();
 
-        userInfoDto.id( user.getId() );
+        userInfoDto.id(user.getId());
 
         return userInfoDto.build();
     }
 
     @Override
     public UserDto toUserDto(User user) {
-        if ( user == null ) {
+        if (user == null) {
             return null;
         }
 
         UserDto.UserDtoBuilder userDto = UserDto.builder();
 
-        userDto.id( user.getId() );
-        userDto.name( user.getName() );
-        userDto.email( user.getEmail() );
+        userDto.id(user.getId());
+        userDto.name(user.getName());
+        userDto.email(user.getEmail());
 
         return userDto.build();
     }
 
     @Override
     public User toUser(UserDto userDto) {
-        if ( userDto == null ) {
+        if (userDto == null) {
             return null;
         }
 
         User.UserBuilder user = User.builder();
 
-        user.id( userDto.getId() );
-        user.name( userDto.getName() );
-        user.email( userDto.getEmail() );
+        user.id(userDto.getId());
+        user.name(userDto.getName());
+        user.email(userDto.getEmail());
 
         return user.build();
     }

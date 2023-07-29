@@ -27,6 +27,7 @@ public class ItemController {
         log.info("Добавление вещи", userId);
         return itemService.create(userId, itemDto);
     }
+
     @PatchMapping("/{itemId}")
     public ItemDto update(
             @RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
@@ -40,6 +41,7 @@ public class ItemController {
 
         return itemService.get(userId, itemId);
     }
+
     @GetMapping
     public List<ItemDto> get(@RequestHeader(X_SHARER_USER_ID) Long userId) {
         log.info("Получение всех вещей");
@@ -52,6 +54,7 @@ public class ItemController {
         log.info("Поиск вещи");
         return itemService.search(userId, text);
     }
+
     @PostMapping("/{itemId}/comment")
     public CommentDto comment(@RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long itemId,
                               @Valid @RequestBody CommentDto commentDto) {

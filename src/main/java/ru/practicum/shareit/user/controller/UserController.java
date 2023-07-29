@@ -17,20 +17,23 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto create(@Valid @RequestBody UserDto userDto){
+    public UserDto create(@Valid @RequestBody UserDto userDto) {
         log.info("Добавление пользователя");
         return userService.create(userDto);
     }
+
     @PatchMapping("/{userId}")
     public UserDto update(@PathVariable Long userId, @RequestBody UserDto userDto) {
         log.info("Обновление данных пользователя");
         return userService.update(userId, userDto);
     }
+
     @GetMapping
     public List<UserDto> get() {
         log.info("Получение всех пользователей");
         return userService.get();
     }
+
     @GetMapping("/{userId}")
     public UserDto get(@PathVariable Long userId) {
         log.info("Получение пользователя по id {}", userId);

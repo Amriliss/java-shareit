@@ -82,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
             return itemDto;
         }
 
-        Optional<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndEndIsBeforeAndStatusIs(
+        Optional<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndStartIsBeforeAndStatusIs(
                 itemId, LocalDateTime.now(), Status.APPROVED, SORT_DESC);
 
         itemDto.setLastBooking(lastBooking.isEmpty() ? null : LastBookingDto.builder()
@@ -93,7 +93,7 @@ public class ItemServiceImpl implements ItemService {
                 .build());
 
 
-        Optional<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndEndIsAfterAndStatusIs(
+        Optional<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndStartIsAfterAndStatusIs(
                 itemId, LocalDateTime.now(), Status.APPROVED, SORT_ASC);
 
         itemDto.setNextBooking(nextBooking.isEmpty() ? null : NextBookingDto.builder()
@@ -123,7 +123,7 @@ public class ItemServiceImpl implements ItemService {
             List<CommentDto> commentDtos = commentService.commentDtos(itemDto.getId());
             itemDto.setComments(commentDtos);
 
-            Optional<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndEndIsBeforeAndStatusIs(
+            Optional<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndStartIsBeforeAndStatusIs(
                     itemDto.getId(), LocalDateTime.now(), Status.APPROVED, SORT_DESC);
 
             itemDto.setLastBooking(lastBooking.isEmpty() ? LastBookingDto.builder().build() : LastBookingDto.builder()
@@ -133,7 +133,7 @@ public class ItemServiceImpl implements ItemService {
                     .end(lastBooking.get().getEnd())
                     .build());
 
-            Optional<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndEndIsAfterAndStatusIs(
+            Optional<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndStartIsAfterAndStatusIs(
                     itemDto.getId(), LocalDateTime.now(), Status.APPROVED, SORT_ASC);
 
             itemDto.setNextBooking(nextBooking.isEmpty() ? NextBookingDto.builder().build() : NextBookingDto.builder()

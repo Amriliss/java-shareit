@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserMapper userMapper;
     private final UserRepository userRepository;
 

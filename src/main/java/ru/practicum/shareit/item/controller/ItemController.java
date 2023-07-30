@@ -19,7 +19,9 @@ import java.util.List;
 public class ItemController {
 
     private final String xSharerUserId = "X-Sharer-User-Id";
+
     private final ItemService itemService;
+
     private final CommentService commentService;
 
 

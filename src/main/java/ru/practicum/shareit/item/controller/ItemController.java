@@ -18,48 +18,48 @@ import java.util.List;
 @Slf4j
 public class ItemController {
 
-    private final String x_SHARER_USER_ID = "X-Sharer-User-Id";
+    private final String xSharerUserId = "X-Sharer-User-Id";
     private final ItemService itemService;
     private final CommentService commentService;
 
 
     @PostMapping
-    public ItemDto create(@RequestHeader(x_SHARER_USER_ID) Long userId, @Valid @RequestBody ItemDto itemDto) {
+    public ItemDto create(@RequestHeader(xSharerUserId) Long userId, @Valid @RequestBody ItemDto itemDto) {
         log.info("Добавление вещи", userId);
         return itemService.create(userId, itemDto);
     }
 
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@RequestHeader(x_SHARER_USER_ID) Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
+    public ItemDto update(@RequestHeader(xSharerUserId) Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
         log.info("Обновление данных вещи");
         return itemService.update(userId, itemId, itemDto);
     }
 
 
     @GetMapping("/{itemId}")
-    public ItemDto get(@RequestHeader(x_SHARER_USER_ID) Long userId, @PathVariable Long itemId) {
+    public ItemDto get(@RequestHeader(xSharerUserId) Long userId, @PathVariable Long itemId) {
         log.info("Получение вещи по id {}", itemId);
         return itemService.get(userId, itemId);
     }
 
 
     @GetMapping
-    public List<ItemDto> get(@RequestHeader(x_SHARER_USER_ID) Long userId) {
+    public List<ItemDto> get(@RequestHeader(xSharerUserId) Long userId) {
         log.info("Получение всех вещей");
         return itemService.get(userId);
     }
 
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestHeader(x_SHARER_USER_ID) Long userId, @RequestParam String text) {
+    public List<ItemDto> search(@RequestHeader(xSharerUserId) Long userId, @RequestParam String text) {
         log.info("Поиск вещи");
         return itemService.search(userId, text);
     }
 
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto comment(@RequestHeader(x_SHARER_USER_ID) Long userId, @PathVariable Long itemId, @Valid @RequestBody CommentDto commentDto) {
+    public CommentDto comment(@RequestHeader(xSharerUserId) Long userId, @PathVariable Long itemId, @Valid @RequestBody CommentDto commentDto) {
         log.info("Добавление комментария");
         return commentService.comment(userId, itemId, commentDto);
     }

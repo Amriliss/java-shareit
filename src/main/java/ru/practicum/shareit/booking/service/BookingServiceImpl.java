@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.dto.State;
-import ru.practicum.shareit.booking.exception.BookingNotFoundException;
-import ru.practicum.shareit.booking.exception.InvalidDateTimeException;
-import ru.practicum.shareit.booking.exception.InvalidStatusException;
-import ru.practicum.shareit.booking.exception.NotAvailableException;
+import ru.practicum.shareit.exception.BookingNotFoundException;
+import ru.practicum.shareit.exception.InvalidDateTimeException;
+import ru.practicum.shareit.exception.InvalidStatusException;
+import ru.practicum.shareit.exception.NotAvailableExceptionBooking;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
@@ -21,6 +21,7 @@ import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,12 +37,13 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     static final Sort SORT = Sort.by(Sort.Direction.DESC, "start");
 
+    @Transactional
     @Override
     public BookingInfoDto create(Long userId, BookingDto bookingDto) {
         Long itemId = bookingDto.getItemId();
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("item not found"));
         if (!item.getAvailable()) {
-            throw new NotAvailableException("item is not available");
+            throw new NotAvailableExceptionBooking("item is not available");
         }
         if (!bookingDto.getEnd().isAfter(bookingDto.getStart())) {
             throw new InvalidDateTimeException("time is wrong");
@@ -60,6 +62,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingInfoDto(booking);
     }
 
+    @Transactional
     @Override
     public BookingInfoDto approve(Long userId, Long bookingId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
@@ -114,6 +117,9 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 bookings = bookingRepository.findAllByBookerIdAndStatus(userId, Status.REJECTED);
                 break;
+            default:
+                bookings = Collections.emptyList();
+
         }
 
         return bookings.isEmpty() ? Collections.emptyList() : bookings.stream()

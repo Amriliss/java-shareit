@@ -4,6 +4,7 @@ import lombok.*;
 import ru.practicum.shareit.booking.dto.LastBookingDto;
 import ru.practicum.shareit.booking.dto.NextBookingDto;
 import ru.practicum.shareit.comment.dto.CommentDto;
+import ru.practicum.shareit.user.dto.Marker;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -24,13 +25,13 @@ public class ItemDto {
 
     private Long id;
 
-    @NotBlank
+    @NotBlank(groups = {Marker.OnCreate.class})
     private String name;
 
-    @NotBlank
+    @NotBlank(groups = {Marker.OnCreate.class})
     private String description;
 
-    @NotNull
+    @NotNull(groups = {Marker.OnCreate.class})
     private Boolean available;
 
     private Long owner;

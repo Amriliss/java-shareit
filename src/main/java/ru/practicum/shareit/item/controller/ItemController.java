@@ -2,11 +2,14 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.service.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.user.dto.Marker;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.List;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class ItemController {
 
     private final String xSharerUserId = "X-Sharer-User-Id";
@@ -24,14 +28,14 @@ public class ItemController {
 
     private final CommentService commentService;
 
-
+    @Transactional
     @PostMapping
-    public ItemDto create(@RequestHeader(xSharerUserId) Long userId, @Valid @RequestBody ItemDto itemDto) {
+    public ItemDto create(@RequestHeader(xSharerUserId) Long userId, @Validated(Marker.OnCreate.class) @RequestBody ItemDto itemDto) {
         log.info("Добавление вещи", userId);
         return itemService.create(userId, itemDto);
     }
 
-
+    @Transactional
     @PatchMapping("/{itemId}")
     public ItemDto update(@RequestHeader(xSharerUserId) Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
         log.info("Обновление данных вещи");
@@ -59,7 +63,7 @@ public class ItemController {
         return itemService.search(userId, text);
     }
 
-
+    @Transactional
     @PostMapping("/{itemId}/comment")
     public CommentDto comment(@RequestHeader(xSharerUserId) Long userId, @PathVariable Long itemId, @Valid @RequestBody CommentDto commentDto) {
         log.info("Добавление комментария");

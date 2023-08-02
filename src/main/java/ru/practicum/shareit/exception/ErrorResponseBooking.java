@@ -1,11 +1,11 @@
-package ru.practicum.shareit.booking.exception;
+package ru.practicum.shareit.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class ErrorResponse {
+public class ErrorResponseBooking {
     private final String error;
 
 }

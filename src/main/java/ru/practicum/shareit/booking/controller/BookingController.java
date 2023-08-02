@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 @Transactional(readOnly = true)
 public class BookingController {
-    private final static String X_SHARER_USER_ID = "X-Sharer-User-Id";
+    private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private final BookingService bookingService;
 
     @Transactional

@@ -89,36 +89,9 @@
             <version>10.0.1</version>
         </dependency>
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>javax.persistence-api</artifactId>
-            <version>2.2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
-            <version>1.6.21</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dorkbox</groupId>
-            <artifactId>Collections</artifactId>
-            <version>1.5</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections-testframework</artifactId>
-            <version>3.2.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections-testframework</artifactId>
-            <version>3.2.1</version>
-            <scope>compile</scope>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>5.3.22</version>
         </dependency>
     </dependencies>
 
@@ -177,15 +150,6 @@
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
                             <version>10.3</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.hibernate.javax.persistence</groupId>
-                            <artifactId>hibernate-jpa-2.1-api</artifactId>
-                            <version>1.0.0.Final</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-data-jpa</artifactId>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -278,6 +242,27 @@
     </build>
     <profiles>
         <profile>
+            <id>check</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </reporting>
         </profile>
         <profile>
             <id>coverage</id>
@@ -291,4 +276,5 @@
             </build>
         </profile>
     </profiles>
+
 </project>

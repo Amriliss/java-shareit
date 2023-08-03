@@ -15,19 +15,17 @@ import java.util.List;
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
+
 public class BookingController {
     private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private final BookingService bookingService;
 
-    @Transactional
     @PostMapping
     public BookingInfoDto create(@RequestHeader(X_SHARER_USER_ID) Long userId, @Valid @RequestBody BookingDto bookingDto) {
         log.info("Добавление брони", userId);
         return bookingService.create(userId, bookingDto);
     }
 
-    @Transactional
     @PatchMapping("/{bookingId}")
     public BookingInfoDto approve(@RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long bookingId,
                                   @RequestParam Boolean approved

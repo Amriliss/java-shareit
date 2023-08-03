@@ -20,8 +20,8 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
 
     private final UserRepository userRepository;
@@ -90,7 +91,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingInfoDto(booking);
     }
 
-    @Override()
+    @Override
     public List<BookingInfoDto> get(Long userId, String value) {
         State state = State.validateState(value);
         User booker = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));

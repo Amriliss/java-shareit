@@ -1,28 +1,28 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.dto.State;
-import ru.practicum.shareit.exception.BookingNotFoundException;
-import ru.practicum.shareit.exception.InvalidDateTimeException;
-import ru.practicum.shareit.exception.InvalidStatusException;
-import ru.practicum.shareit.exception.NotAvailableExceptionBooking;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.item.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.exception.UserNotFoundException;
+import ru.practicum.shareit.requests.pagerequestmanager.PageRequestManager;
+import ru.practicum.shareit.strategy.BookingStateFetchStrategy;
+import ru.practicum.shareit.strategy.StrategyFactoryForBooker;
+import ru.practicum.shareit.strategy.StrategyFactoryForOwner;
+import ru.practicum.shareit.strategy.StrategyName;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +36,9 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
+    private final StrategyFactoryForOwner strategyFactoryForOwner;
+
+    private final StrategyFactoryForBooker strategyFactoryForBooker;
     static final Sort SORT = Sort.by(Sort.Direction.DESC, "start");
 
     @Transactional
@@ -91,74 +94,44 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingInfoDto(booking);
     }
 
-    @Override
-    public List<BookingInfoDto> get(Long userId, String value) {
-        State state = State.validateState(value);
+    @Override()
+    public List<BookingInfoDto> get(Long userId, String value, Long from, Long size) {
+        State state = validateState(value);
+        StrategyName strategyName = StrategyName.valueOf(state.name());
         User booker = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));
         List<Booking> bookings = new ArrayList<>();
-
-        switch (state) {
-            case ALL:
-                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
-                break;
-            case PAST:
-                bookings = bookingRepository.findAllByBookerIdAndEndIsBefore(userId, LocalDateTime.now(), SORT);
-                break;
-            case FUTURE:
-                bookings = bookingRepository.findAllByBookerIdAndStartIsAfter(userId, LocalDateTime.now(), SORT);
-                break;
-            case CURRENT:
-                bookings = bookingRepository
-                        .findAllByBookerIdAndStartIsBeforeAndEndIsAfter(
-                                userId, LocalDateTime.now(), LocalDateTime.now(), SORT);
-                break;
-            case WAITING:
-                bookings = bookingRepository.findAllByBookerIdAndStatus(userId, Status.WAITING);
-                break;
-            case REJECTED:
-                bookings = bookingRepository.findAllByBookerIdAndStatus(userId, Status.REJECTED);
-                break;
-            default:
-                bookings = Collections.emptyList();
-
-        }
-
+        PageRequest pageReq = PageRequestManager.form(
+                from.intValue(), size.intValue(), Sort.Direction.DESC, "start");
+        BookingStateFetchStrategy strategyForBooker = strategyFactoryForBooker.findStrategy(strategyName);
+        bookings = strategyForBooker.fetch(userId, pageReq);
         return bookings.isEmpty() ? Collections.emptyList() : bookings.stream()
                 .map(BookingMapper::toBookingInfoDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingInfoDto> getByOwner(Long userId, String value) {
-        State state = State.validateState(value);
+    public List<BookingInfoDto> getByOwner(Long userId, String value, Long from, Long size) {
+        State state = validateState(value);
+        StrategyName strategyName = StrategyName.valueOf(state.name());
         User owner = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));
         List<Booking> bookings = new ArrayList<>();
-
-        switch (state) {
-            case ALL:
-                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
-                break;
-            case PAST:
-                bookings = bookingRepository.findAllByItemOwnerIdAndEndIsBefore(userId, LocalDateTime.now(), SORT);
-                break;
-            case FUTURE:
-                bookings = bookingRepository.findAllByItemOwnerIdAndStartIsAfter(userId, LocalDateTime.now(), SORT);
-                break;
-            case CURRENT:
-                bookings = bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfter(
-                        userId, LocalDateTime.now(), LocalDateTime.now(), SORT);
-                break;
-            case WAITING:
-                bookings = bookingRepository.findAllByItemOwnerIdAndStatus(userId, Status.WAITING);
-                break;
-            case REJECTED:
-                bookings = bookingRepository.findAllByItemOwnerIdAndStatus(userId, Status.REJECTED);
-                break;
-        }
-
+        PageRequest pageReq = PageRequestManager.form(
+                from.intValue(), size.intValue(), Sort.Direction.DESC, "start");
+        BookingStateFetchStrategy strategyForOwner = strategyFactoryForOwner.findStrategy(strategyName);
+        bookings = strategyForOwner.fetch(userId, pageReq);
         return bookings.isEmpty() ? Collections.emptyList() : bookings.stream()
                 .map(BookingMapper::toBookingInfoDto)
                 .collect(Collectors.toList());
+    }
+
+    private State validateState(String value) throws InvalidStatusException {
+        State state = State.ALL;
+        try {
+            state = State.valueOf(value);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidStatusException("Unknown state: " + value);
+        }
+        return state;
     }
 
     private boolean isUserIsOwner(Long userId, Item item) {

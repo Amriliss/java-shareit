@@ -1,23 +1,19 @@
-package ru.practicum.shareit.request;
-
+package ru.practicum.shareit.requests.model;
 import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
-/**
- * TODO Sprint add-item-requests.
- */
+import java.util.Objects;
 @Entity
 @Table(name = "requests")
 @Getter
 @Setter
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ItemRequest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,6 +37,6 @@ public class ItemRequest {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hashCode(id);
     }
 }

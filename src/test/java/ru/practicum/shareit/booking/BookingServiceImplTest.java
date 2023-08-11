@@ -142,8 +142,8 @@ class BookingServiceImplTest {
         when(itemRepository.findById(1L))
                 .thenReturn(Optional.of(item));
 
-        NotAvailableException notAvailableException;
-        notAvailableException = Assertions.assertThrows(NotAvailableException.class,
+        NotAvailableExceptionBooking notAvailableException;
+        notAvailableException = Assertions.assertThrows(NotAvailableExceptionBooking.class,
                 () -> bookingService.create(3L, bookingDto));
         assertThat(notAvailableException.getMessage(), is("item is not available"));
     }

@@ -7,6 +7,7 @@ import ru.practicum.shareit.requests.model.ItemRequest;
 
 import java.util.List;
 import java.util.Optional;
+
 @Repository
 public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> {
     List<ItemRequest> findAllByRequesterIdOrderByCreatedDesc(Long userId);

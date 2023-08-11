@@ -2,6 +2,7 @@ package ru.practicum.shareit.requests.pagerequestmanager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.exception.PaginationException;
+
 public class PageRequestManager {
 
     public static PageRequest form(int from, int size, Sort.Direction direction, String properties) throws PaginationException {

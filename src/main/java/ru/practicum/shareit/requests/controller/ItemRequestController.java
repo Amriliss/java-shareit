@@ -8,10 +8,12 @@ import ru.practicum.shareit.requests.service.ItemRequestService;
 
 import javax.validation.Valid;
 import java.util.List;
+
 @RestController
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
 public class ItemRequestController {
+
     private final ItemRequestService itemRequestService;
     private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
 

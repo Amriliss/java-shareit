@@ -43,4 +43,5 @@ public class ItemDto {
 
     private NextBookingDto nextBooking;
 
-    private List<CommentDto> comments;}
+    private List<CommentDto> comments;
+}

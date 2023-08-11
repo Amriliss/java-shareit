@@ -207,5 +207,6 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.text", is(commentDtoCreated.getText())))
                 .andExpect(jsonPath("$.authorName", is(commentDtoCreated.getAuthorName())))
                 .andExpect(jsonPath("$.created",
-                        is(commentDtoCreated.getCreated().format(DateTimeFormatter.ISO_DATE_TIME))));}
+                        is(commentDtoCreated.getCreated().format(DateTimeFormatter.ISO_DATE_TIME))));
     }
+}

@@ -425,6 +425,7 @@ class ItemServiceImplTest {
         itemDtos = itemService.get(2L, 0, 10);
         assertThat(itemDtos, is(notNullValue()));
     }
+
     @Test
     void search() throws Exception {
         User owner = User.builder()

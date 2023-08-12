@@ -18,6 +18,7 @@ public class ItemMapper {
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
+                .owner(item.getOwner().getId())
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .requestId(Optional.ofNullable(item.getRequest()).map(ItemRequest::getId).orElse(null))

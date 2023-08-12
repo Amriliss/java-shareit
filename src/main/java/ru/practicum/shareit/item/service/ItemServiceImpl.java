@@ -111,18 +111,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> get(Long userId, Integer from, Integer size) {
-        User owner = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
 
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Item> repoItems = itemRepository.findAllByOwnerId(userId, pageRequest);
 
         List<ItemDto> itemDtoList = repoItems.stream()
                 .map(ItemMapper::toItemDto)
-                .peek(itemDto -> itemDto.setOwner(owner.getId()))
                 .collect(Collectors.toList());
 
         for (ItemDto itemDto : itemDtoList) {
-
             Sort sortDesc = Sort.by(Sort.Direction.DESC, "end");
             Optional<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndStartIsBeforeAndStatusIs(
                     itemDto.getId(), LocalDateTime.now(), Status.APPROVED, sortDesc);

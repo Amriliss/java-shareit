@@ -131,7 +131,7 @@ class ItemRequestControllerTest {
     void getAll() throws Exception {
         itemRequestDtoCreated.setItems(List.of(itemDto));
 
-        when(itemRequestService.get(3L, 0L, 10L))
+        when(itemRequestService.get(3L, 0, 10))
                 .thenReturn(List.of(itemRequestDtoCreated));
 
         mvc.perform(get("/requests/all")

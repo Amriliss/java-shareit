@@ -161,7 +161,7 @@ class ItemControllerTest {
 
     @Test
     void getAll() throws Exception {
-        when(itemService.get(1L, 0L, 10L))
+        when(itemService.get(1L, 0, 10))
                 .thenReturn(List.of(itemDtoUpdated));
 
         mvc.perform(get("/items/")
@@ -177,7 +177,7 @@ class ItemControllerTest {
 
     @Test
     void search() throws Exception {
-        when(itemService.search(1L, "update", 0L, 10L))
+        when(itemService.search(1L, "update", 0, 10))
                 .thenReturn(List.of(itemDtoUpdated));
 
         mvc.perform(get("/items/search?text=update")

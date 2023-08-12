@@ -107,11 +107,11 @@ class BookingServiceImplTest {
                 .itemId(1L)
                 .build();
 
-        ItemNotFoundException invalidItemIdException;
+        NotFoundException invalidItemIdException;
 
         when(itemRepository.findById(1L))
                 .thenReturn(Optional.empty());
-        invalidItemIdException = Assertions.assertThrows(ItemNotFoundException.class,
+        invalidItemIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> bookingService.create(3L, bookingDto));
         assertThat(invalidItemIdException.getMessage(), is("item not found"));
     }
@@ -214,15 +214,15 @@ class BookingServiceImplTest {
         when(userRepository.findById(3L))
                 .thenReturn(Optional.empty());
 
-        UserNotFoundException userNotFoundException;
-        userNotFoundException = Assertions.assertThrows(UserNotFoundException.class,
+        NotFoundException userNotFoundException;
+        userNotFoundException = Assertions.assertThrows(NotFoundException.class,
                 () -> bookingService.create(3L, bookingDto));
         assertThat(userNotFoundException.getMessage(), is("user not found"));
 
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(owner));
 
-        userNotFoundException = Assertions.assertThrows(UserNotFoundException.class,
+        userNotFoundException = Assertions.assertThrows(NotFoundException.class,
                 () -> bookingService.create(1L, bookingDto));
         assertThat(userNotFoundException.getMessage(), is("user not found"));
 
@@ -237,23 +237,23 @@ class BookingServiceImplTest {
         when(bookingRepository.findById(1L))
                 .thenReturn(Optional.of(booking));
 
-        userNotFoundException = Assertions.assertThrows(UserNotFoundException.class,
+        userNotFoundException = Assertions.assertThrows(NotFoundException.class,
                 () -> bookingService.approve(3L, 1L, true));
         assertThat(userNotFoundException.getMessage(), is("user not found"));
 
-        userNotFoundException = Assertions.assertThrows(UserNotFoundException.class,
+        userNotFoundException = Assertions.assertThrows(NotFoundException.class,
                 () -> bookingService.get(2L, 1L));
         assertThat(userNotFoundException.getMessage(), is("user not found"));
 
         when(userRepository.findById(2L))
                 .thenReturn(Optional.empty());
 
-        userNotFoundException = Assertions.assertThrows(UserNotFoundException.class,
-                () -> bookingService.get(2L, "ALL", 0L, 10L));
+        userNotFoundException = Assertions.assertThrows(NotFoundException.class,
+                () -> bookingService.get(2L, "ALL", 0, 10));
         assertThat(userNotFoundException.getMessage(), is("user not found"));
 
-        userNotFoundException = Assertions.assertThrows(UserNotFoundException.class,
-                () -> bookingService.getByOwner(2L, "ALL", 0L, 10L));
+        userNotFoundException = Assertions.assertThrows(NotFoundException.class,
+                () -> bookingService.getByOwner(2L, "ALL", 0, 10));
         assertThat(userNotFoundException.getMessage(), is("user not found"));
     }
 
@@ -398,7 +398,7 @@ class BookingServiceImplTest {
         assertThat(invalidStatusException.getMessage(), is("no change allowed"));
 
         invalidStatusException = Assertions.assertThrows(InvalidStatusException.class,
-                () -> bookingService.get(1L, "value", 0L, 10L));
+                () -> bookingService.get(1L, "value", 0, 10));
         assertThat(invalidStatusException.getMessage(), is("Unknown state: value"));
     }
 
@@ -482,7 +482,7 @@ class BookingServiceImplTest {
                 .build();
         when(bookingRepository.findAllByBookerId(any(), any()))
                 .thenReturn(List.of(booking1));
-        List<BookingInfoDto> bookingInfoDtoList = bookingService.get(3L, "ALL", 0L, 10L);
+        List<BookingInfoDto> bookingInfoDtoList = bookingService.get(3L, "ALL", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
 
         start = LocalDateTime.now().minusDays(2L);
@@ -497,7 +497,7 @@ class BookingServiceImplTest {
                 .build();
         when(bookingRepository.findAllByBookerIdAndEndIsBefore(any(), any(), any()))
                 .thenReturn(List.of(booking2));
-        bookingInfoDtoList = bookingService.get(3L, "PAST", 0L, 10L);
+        bookingInfoDtoList = bookingService.get(3L, "PAST", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
 
         start = LocalDateTime.now().plusDays(1L);
@@ -512,7 +512,7 @@ class BookingServiceImplTest {
                 .build();
         when(bookingRepository.findAllByBookerIdAndStartIsAfter(any(), any(), any()))
                 .thenReturn(List.of(booking3));
-        bookingInfoDtoList = bookingService.get(3L, "FUTURE", 0L, 10L);
+        bookingInfoDtoList = bookingService.get(3L, "FUTURE", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
 
         start = LocalDateTime.now().minusDays(1L);
@@ -527,7 +527,7 @@ class BookingServiceImplTest {
                 .build();
         when(bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfter(any(), any(), any(), any()))
                 .thenReturn(List.of(booking4));
-        bookingInfoDtoList = bookingService.get(3L, "CURRENT", 0L, 10L);
+        bookingInfoDtoList = bookingService.get(3L, "CURRENT", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
 
         start = LocalDateTime.now().plusDays(1L);
@@ -568,46 +568,16 @@ class BookingServiceImplTest {
         when(userRepository.findById(6L))
                 .thenReturn(Optional.of(booker6));
 
-        bookingInfoDtoList = bookingService.get(3L, "WAITING", 0L, 10L);
+        bookingInfoDtoList = bookingService.get(3L, "WAITING", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
         assertThat(bookingInfoDtoList.get(0).getStatus(), is(Status.WAITING));
 
-        bookingInfoDtoList = bookingService.get(3L, "REJECTED", 0L, 10L);
+        bookingInfoDtoList = bookingService.get(3L, "REJECTED", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
         assertThat(bookingInfoDtoList.get(0).getStatus(), is(Status.REJECTED));
 
-        bookingInfoDtoList = bookingService.get(6L, "WAITING", 0L, 10L);
+        bookingInfoDtoList = bookingService.get(6L, "WAITING", 0, 10);
         Assertions.assertTrue(bookingInfoDtoList.isEmpty());
-    }
-
-    @Test
-    void throwPaginationException() {
-        User user = User.builder()
-                .id(3L)
-                .name("user3")
-                .email("user3@email.com")
-                .build();
-
-        when(userRepository.findById(3L))
-                .thenReturn(Optional.of(user));
-
-        PaginationException invalidPageParamsException;
-
-        invalidPageParamsException = Assertions.assertThrows(PaginationException.class,
-                () -> bookingService.get(3L, "ALL", -1L, 10L));
-        assertThat(invalidPageParamsException.getMessage(), is("paging invalid"));
-
-        invalidPageParamsException = Assertions.assertThrows(PaginationException.class,
-                () -> bookingService.get(3L, "ALL", 0L, 0L));
-        assertThat(invalidPageParamsException.getMessage(), is("paging invalid"));
-
-        invalidPageParamsException = Assertions.assertThrows(PaginationException.class,
-                () -> bookingService.getByOwner(3L, "ALL", -1L, 10L));
-        assertThat(invalidPageParamsException.getMessage(), is("paging invalid"));
-
-        invalidPageParamsException = Assertions.assertThrows(PaginationException.class,
-                () -> bookingService.getByOwner(3L, "ALL", 0L, 0L));
-        assertThat(invalidPageParamsException.getMessage(), is("paging invalid"));
     }
 
     @Test
@@ -649,7 +619,7 @@ class BookingServiceImplTest {
         when(bookingRepository.findAllByItemOwnerId(any(), any()))
                 .thenReturn(List.of(booking1));
 
-        List<BookingInfoDto> bookingInfoDtoList = bookingService.getByOwner(1L, "ALL", 0L, 10L);
+        List<BookingInfoDto> bookingInfoDtoList = bookingService.getByOwner(1L, "ALL", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
 
         start = LocalDateTime.now().minusDays(2L);
@@ -664,7 +634,7 @@ class BookingServiceImplTest {
                 .build();
         when(bookingRepository.findAllByItemOwnerIdAndEndIsBefore(any(), any(), any()))
                 .thenReturn(List.of(booking2));
-        bookingInfoDtoList = bookingService.getByOwner(1L, "PAST", 0L, 10L);
+        bookingInfoDtoList = bookingService.getByOwner(1L, "PAST", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
 
         start = LocalDateTime.now().plusDays(1L);
@@ -679,7 +649,7 @@ class BookingServiceImplTest {
                 .build();
         when(bookingRepository.findAllByItemOwnerIdAndStartIsAfter(any(), any(), any()))
                 .thenReturn(List.of(booking3));
-        bookingInfoDtoList = bookingService.getByOwner(1L, "FUTURE", 0L, 10L);
+        bookingInfoDtoList = bookingService.getByOwner(1L, "FUTURE", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
 
         start = LocalDateTime.now().minusDays(1L);
@@ -694,7 +664,7 @@ class BookingServiceImplTest {
                 .build();
         when(bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfter(any(), any(), any(), any()))
                 .thenReturn(List.of(booking4));
-        bookingInfoDtoList = bookingService.getByOwner(1L, "CURRENT", 0L, 10L);
+        bookingInfoDtoList = bookingService.getByOwner(1L, "CURRENT", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
 
         start = LocalDateTime.now().plusDays(1L);
@@ -735,15 +705,15 @@ class BookingServiceImplTest {
         when(userRepository.findById(6L))
                 .thenReturn(Optional.of(booker6));
 
-        bookingInfoDtoList = bookingService.getByOwner(1L, "WAITING", 0L, 10L);
+        bookingInfoDtoList = bookingService.getByOwner(1L, "WAITING", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
         assertThat(bookingInfoDtoList.get(0).getStatus(), is(Status.WAITING));
 
-        bookingInfoDtoList = bookingService.getByOwner(1L, "REJECTED", 0L, 10L);
+        bookingInfoDtoList = bookingService.getByOwner(1L, "REJECTED", 0, 10);
         Assertions.assertFalse(bookingInfoDtoList.isEmpty());
         assertThat(bookingInfoDtoList.get(0).getStatus(), is(Status.REJECTED));
 
-        bookingInfoDtoList = bookingService.getByOwner(6L, "WAITING", 0L, 10L);
+        bookingInfoDtoList = bookingService.getByOwner(6L, "WAITING", 0, 10);
         Assertions.assertTrue(bookingInfoDtoList.isEmpty());
     }
 }

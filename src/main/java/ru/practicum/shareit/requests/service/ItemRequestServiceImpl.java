@@ -5,9 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ItemRequestNotFoundException;
-import ru.practicum.shareit.exception.PaginationException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -40,7 +38,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional
     public ItemRequestDto create(Long userId, ItemRequestDto itemRequestDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("user not found"));
+                .orElseThrow(() -> new NotFoundException("user not found"));
         itemRequestDto.setCreated(LocalDateTime.now());
         ItemRequest itemRequest = itemRequestMapper.toItemRequest(itemRequestDto, user);
         itemRequest = itemRequestRepository.save(itemRequest);
@@ -53,7 +51,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> get(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("user not found"));
+                .orElseThrow(() -> new NotFoundException("user not found"));
         List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(
                 userId);
         if (itemRequests.isEmpty()) {
@@ -89,13 +87,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     // size - количество элементов для отображения
 
     @Override
-    public List<ItemRequestDto> get(Long userId, Long from, Long size) throws PaginationException {
+    public List<ItemRequestDto> get(Long userId, Integer from, Integer size) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("user not found"));
+                .orElseThrow(() -> new NotFoundException("user not found"));
 
-        PageRequest pageRequest = PageRequestManager.form(
-                from.intValue(), size.intValue(), Sort.Direction.DESC, "created");
+        PageRequest pageRequest = PageRequestManager.form(from, size, Sort.Direction.DESC, "created");
         List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdIsNot(userId,
                 pageRequest);
 
@@ -122,15 +119,14 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return itemRequestDtos;
     }
 
-
     // Получить запрос по id (любой пользователь любой запрос)
     @Override
     public ItemRequestDto get(Long userId, Long requestId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("user not found"));
+                .orElseThrow(() -> new NotFoundException("user not found"));
         ItemRequest itemRequest = itemRequestRepository.findItemRequestById(requestId)
-                .orElseThrow(() -> new ItemRequestNotFoundException("request not found"));
+                .orElseThrow(() -> new NotFoundException("request not found"));
         ItemRequestDto itemRequestDto = itemRequestMapper.toItemRequestDto(itemRequest);
 
         List<Item> items = itemRepository.findAllByRequestId(itemRequestDto.getId());

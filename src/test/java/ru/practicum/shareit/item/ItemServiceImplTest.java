@@ -14,9 +14,7 @@ import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.comment.repository.CommentRepository;
 import ru.practicum.shareit.exception.InvalidCommentException;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.PaginationException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -98,26 +96,26 @@ class ItemServiceImplTest {
                 .available(true)
                 .build();
 
-        UserNotFoundException invalidUserIdException;
+        NotFoundException invalidUserIdException;
 
-        invalidUserIdException = Assertions.assertThrows(UserNotFoundException.class,
+        invalidUserIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemService.create(1L, itemDto));
         assertThat(invalidUserIdException.getMessage(), is("user not found"));
 
-        invalidUserIdException = Assertions.assertThrows(UserNotFoundException.class,
+        invalidUserIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemService.update(1L, 1L, itemDto));
         assertThat(invalidUserIdException.getMessage(), is("user not found"));
 
-        invalidUserIdException = Assertions.assertThrows(UserNotFoundException.class,
+        invalidUserIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemService.get(1L, 1L));
         assertThat(invalidUserIdException.getMessage(), is("user not found"));
 
-        invalidUserIdException = Assertions.assertThrows(UserNotFoundException.class,
-                () -> itemService.get(1L, 0L, 10L));
+        invalidUserIdException = Assertions.assertThrows(NotFoundException.class,
+                () -> itemService.get(1L, 0, 10));
         assertThat(invalidUserIdException.getMessage(), is("user not found"));
 
-        invalidUserIdException = Assertions.assertThrows(UserNotFoundException.class,
-                () -> itemService.search(1L, "text", 0L, 10L));
+        invalidUserIdException = Assertions.assertThrows(NotFoundException.class,
+                () -> itemService.search(1L, "text", 0, 10));
         assertThat(invalidUserIdException.getMessage(), is("user not found"));
 
         CommentDto commentDto = CommentDto.builder()
@@ -142,7 +140,7 @@ class ItemServiceImplTest {
         when(userRepository.findById(3L))
                 .thenReturn(Optional.empty());
 
-        invalidUserIdException = Assertions.assertThrows(UserNotFoundException.class,
+        invalidUserIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemService.comment(3L, 1L, commentDto));
         assertThat(invalidUserIdException.getMessage(), is("user not found"));
     }
@@ -167,7 +165,7 @@ class ItemServiceImplTest {
                 .available(true)
                 .build();
 
-        ItemNotFoundException invalidItemIdException;
+        NotFoundException invalidItemIdException;
 
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(user));
@@ -175,11 +173,11 @@ class ItemServiceImplTest {
         when(itemRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
-        invalidItemIdException = Assertions.assertThrows(ItemNotFoundException.class,
+        invalidItemIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemService.update(1L, 1L, itemDto));
         assertThat(invalidItemIdException.getMessage(), is("item not found"));
 
-        invalidItemIdException = Assertions.assertThrows(ItemNotFoundException.class,
+        invalidItemIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemService.get(1L, 1L));
         assertThat(invalidItemIdException.getMessage(), is("item not found"));
 
@@ -193,7 +191,7 @@ class ItemServiceImplTest {
         when(itemRepository.findById(1L))
                 .thenReturn(Optional.of(item));
 
-        invalidItemIdException = Assertions.assertThrows(ItemNotFoundException.class,
+        invalidItemIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemService.update(1L, 1L, itemDto));
         assertThat(invalidItemIdException.getMessage(), is("item not found"));
 
@@ -203,7 +201,7 @@ class ItemServiceImplTest {
         when(itemRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
-        invalidItemIdException = Assertions.assertThrows(ItemNotFoundException.class,
+        invalidItemIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemService.comment(3L, 1L, commentDto));
         assertThat(invalidItemIdException.getMessage(), is("item not found"));
     }
@@ -357,7 +355,7 @@ class ItemServiceImplTest {
         when(itemRepository.findAllByOwnerId(any(), any()))
                 .thenReturn(Collections.emptyList());
 
-        List<ItemDto> itemDtos = itemService.get(2L, 0L, 10L);
+        List<ItemDto> itemDtos = itemService.get(2L, 0, 10);
         Assertions.assertTrue(itemDtos.isEmpty());
 
         Item item = Item.builder()
@@ -410,7 +408,7 @@ class ItemServiceImplTest {
         when(bookingRepository.findTop1BookingByItemIdAndStartIsAfterAndStatusIs(any(), any(), any(), any()))
                 .thenReturn(Optional.of(nextBooking));
 
-        itemDtos = itemService.get(2L, 0L, 10L);
+        itemDtos = itemService.get(2L, 0, 10);
         assertThat(itemDtos, is(notNullValue()));
 
         when(bookingRepository.findTop1BookingByItemIdAndStartIsBeforeAndStatusIs(any(), any(), any(), any()))
@@ -418,7 +416,7 @@ class ItemServiceImplTest {
         when(bookingRepository.findTop1BookingByItemIdAndStartIsAfterAndStatusIs(any(), any(), any(), any()))
                 .thenReturn(Optional.empty());
 
-        itemDtos = itemService.get(2L, 0L, 10L);
+        itemDtos = itemService.get(2L, 0, 10);
         assertThat(itemDtos, is(notNullValue()));
 
         Item item2 = Item.builder()
@@ -433,40 +431,9 @@ class ItemServiceImplTest {
         when(commentRepository.findAllByItemId(2L))
                 .thenReturn(Collections.emptyList());
 
-        itemDtos = itemService.get(2L, 0L, 10L);
+        itemDtos = itemService.get(2L, 0, 10);
         assertThat(itemDtos, is(notNullValue()));
     }
-
-    @Test
-    void throwPaginationException() {
-        User owner = User.builder()
-                .id(2L)
-                .name("user2")
-                .email("user2@email.com")
-                .build();
-
-        when(userRepository.findById(2L))
-                .thenReturn(Optional.of(owner));
-
-        PaginationException invalidPageParamsException;
-
-        invalidPageParamsException = Assertions.assertThrows(PaginationException.class,
-                () -> itemService.get(2L, -1L, 10L));
-        assertThat(invalidPageParamsException.getMessage(), is("paging invalid"));
-
-        invalidPageParamsException = Assertions.assertThrows(PaginationException.class,
-                () -> itemService.get(2L, 0L, 0L));
-        assertThat(invalidPageParamsException.getMessage(), is("paging invalid"));
-
-        invalidPageParamsException = Assertions.assertThrows(PaginationException.class,
-                () -> itemService.search(2L, "text", -1L, 10L));
-        assertThat(invalidPageParamsException.getMessage(), is("paging invalid"));
-
-        invalidPageParamsException = Assertions.assertThrows(PaginationException.class,
-                () -> itemService.search(2L, "text", 0L, 0L));
-        assertThat(invalidPageParamsException.getMessage(), is("paging invalid"));
-    }
-
     @Test
     void search() throws Exception {
         User owner = User.builder()
@@ -478,7 +445,7 @@ class ItemServiceImplTest {
         when(userRepository.findById(2L))
                 .thenReturn(Optional.of(owner));
 
-        List<ItemDto> itemDtos = itemService.search(2L, "", 0L, 10L);
+        List<ItemDto> itemDtos = itemService.search(2L, "", 0, 10);
         Assertions.assertTrue(itemDtos.isEmpty());
 
         Item item = Item.builder()
@@ -492,14 +459,14 @@ class ItemServiceImplTest {
         when(itemRepository.searchAvailableByText(any(), any()))
                 .thenReturn(Collections.emptyList());
 
-        itemDtos = itemService.search(2L, "text", 0L, 10L);
+        itemDtos = itemService.search(2L, "text", 0, 10);
         Assertions.assertTrue(itemDtos.isEmpty());
 
         List<Item> items = List.of(item);
 
         when(itemRepository.searchAvailableByText(any(), any()))
                 .thenReturn(items);
-        itemDtos = itemService.search(2L, "description", 0L, 10L);
+        itemDtos = itemService.search(2L, "description", 0, 10);
         assertThat(itemDtos, is(notNullValue()));
     }
 

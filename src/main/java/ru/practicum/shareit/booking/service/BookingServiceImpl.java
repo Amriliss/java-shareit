@@ -37,15 +37,13 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
     private final StrategyFactoryForOwner strategyFactoryForOwner;
-
     private final StrategyFactoryForBooker strategyFactoryForBooker;
-    static final Sort SORT = Sort.by(Sort.Direction.DESC, "start");
 
     @Transactional
     @Override
     public BookingInfoDto create(Long userId, BookingDto bookingDto) {
         Long itemId = bookingDto.getItemId();
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("item not found"));
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("item not found"));
         if (!item.getAvailable()) {
             throw new NotAvailableExceptionBooking("item is not available");
         }
@@ -53,9 +51,9 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidDateTimeException("time is wrong");
         }
 
-        User booker = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));
+        User booker = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
         if (booker.getId().equals(item.getOwner().getId())) {
-            throw new UserNotFoundException("user not found");
+            throw new NotFoundException("user not found");
         }
 
         Booking booking = BookingMapper.toBooking(bookingDto);
@@ -73,7 +71,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new BookingNotFoundException("booking not found"));
         Item item = booking.getItem();
         if (isUserIsOwner(userId, item)) {
-            throw new UserNotFoundException("user not found");
+            throw new NotFoundException("user not found");
         }
         if (booking.getStatus().equals(Status.APPROVED) || booking.getStatus().equals(Status.REJECTED)) {
             throw new InvalidStatusException("no change allowed");
@@ -89,19 +87,19 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new BookingNotFoundException("booking not found"));
         Item item = booking.getItem();
         if (isUserIsOwner(userId, item) && !userId.equals(booking.getBooker().getId())) {
-            throw new UserNotFoundException("user not found");
+            throw new NotFoundException("user not found");
         }
         return BookingMapper.toBookingInfoDto(booking);
     }
 
     @Override()
-    public List<BookingInfoDto> get(Long userId, String value, Long from, Long size) {
+    public List<BookingInfoDto> get(Long userId, String value, Integer from, Integer size) {
         State state = validateState(value);
         StrategyName strategyName = StrategyName.valueOf(state.name());
-        User booker = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));
+        User booker = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
         List<Booking> bookings = new ArrayList<>();
         PageRequest pageReq = PageRequestManager.form(
-                from.intValue(), size.intValue(), Sort.Direction.DESC, "start");
+                from, size, Sort.Direction.DESC, "start");
         BookingStateFetchStrategy strategyForBooker = strategyFactoryForBooker.findStrategy(strategyName);
         bookings = strategyForBooker.fetch(userId, pageReq);
         return bookings.isEmpty() ? Collections.emptyList() : bookings.stream()
@@ -110,13 +108,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingInfoDto> getByOwner(Long userId, String value, Long from, Long size) {
+    public List<BookingInfoDto> getByOwner(Long userId, String value, Integer from, Integer size) {
         State state = validateState(value);
         StrategyName strategyName = StrategyName.valueOf(state.name());
-        User owner = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));
+        User owner = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
         List<Booking> bookings = new ArrayList<>();
         PageRequest pageReq = PageRequestManager.form(
-                from.intValue(), size.intValue(), Sort.Direction.DESC, "start");
+                from, size, Sort.Direction.DESC, "start");
         BookingStateFetchStrategy strategyForOwner = strategyFactoryForOwner.findStrategy(strategyName);
         bookings = strategyForOwner.fetch(userId, pageReq);
         return bookings.isEmpty() ? Collections.emptyList() : bookings.stream()
@@ -125,13 +123,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private State validateState(String value) throws InvalidStatusException {
-        State state = State.ALL;
         try {
-            state = State.valueOf(value);
+            return State.valueOf(value);
         } catch (IllegalArgumentException e) {
             throw new InvalidStatusException("Unknown state: " + value);
         }
-        return state;
     }
 
     private boolean isUserIsOwner(Long userId, Item item) {

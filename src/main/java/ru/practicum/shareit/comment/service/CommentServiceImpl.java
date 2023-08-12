@@ -13,8 +13,7 @@ import ru.practicum.shareit.comment.mapper.CommentMapper;
 import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.comment.repository.CommentRepository;
 import ru.practicum.shareit.exception.InvalidCommentException;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -37,8 +36,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentDto comment(Long userId, Long itemId, CommentDto commentDto) {
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("item not found"));
-        User author = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("item not found"));
+        User author = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
         Sort sortDesc = Sort.by(Sort.Direction.DESC, "end");
         Booking booking = bookingRepository.findTop1BookingByItemIdAndBookerIdAndEndIsBeforeAndStatusIs(
                 itemId, userId, LocalDateTime.now(), Status.APPROVED, sortDesc).orElseThrow(

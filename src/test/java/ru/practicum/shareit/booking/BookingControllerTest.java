@@ -158,7 +158,7 @@ class BookingControllerTest {
 
     @Test
     void getAll() throws Exception {
-        when(bookingService.get(1L, "ALL", 0L, 10L))
+        when(bookingService.get(1L, "ALL", 0, 10))
                 .thenReturn(List.of(bookingInfoDto));
 
         mvc.perform(get("/bookings/")
@@ -177,7 +177,7 @@ class BookingControllerTest {
 
     @Test
     void getByOwner() throws Exception {
-        when(bookingService.getByOwner(1L, "ALL", 0L, 10L))
+        when(bookingService.getByOwner(1L, "ALL", 0, 10))
                 .thenReturn(List.of(bookingInfoDto));
 
         mvc.perform(get("/bookings/owner")

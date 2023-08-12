@@ -14,9 +14,10 @@ import java.util.List;
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 @Slf4j
-
 public class BookingController {
+
     public static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
+
     private final BookingService bookingService;
 
     @PostMapping
@@ -42,8 +43,8 @@ public class BookingController {
     @GetMapping
     public List<BookingInfoDto> get(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                     @RequestParam(defaultValue = "ALL", required = false) String state,
-                                    @RequestParam(defaultValue = "0") Long from,
-                                    @RequestParam(defaultValue = "10") Long size) {
+                                    @RequestParam(defaultValue = "0")  Integer from,
+                                    @RequestParam(defaultValue = "10")  Integer size) {
         log.info("Получение всей брони");
         return bookingService.get(userId, state, from, size);
     }
@@ -51,8 +52,8 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingInfoDto> getByOwner(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                            @RequestParam(defaultValue = "ALL", required = false) String state,
-                                           @RequestParam(defaultValue = "0") Long from,
-                                           @RequestParam(defaultValue = "10") Long size) {
+                                           @RequestParam(defaultValue = "0")  Integer from,
+                                           @RequestParam(defaultValue = "10")  Integer size) {
         log.info("Получение брони по владельцу", userId);
         return bookingService.getByOwner(userId, state, from, size);
     }

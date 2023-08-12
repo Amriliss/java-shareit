@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -95,7 +95,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void throwUserNotFoundException() {
+    void throwNotFoundException() {
         UserDto userDto = UserDto.builder()
                 .name("name updated")
                 .email("userUpdated@email.com")
@@ -104,13 +104,13 @@ class UserServiceImplTest {
         when(userRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
-        final UserNotFoundException updateException = Assertions.assertThrows(
-                UserNotFoundException.class,
+        final NotFoundException updateException = Assertions.assertThrows(
+                NotFoundException.class,
                 () -> userService.update(1L, userDto)
         );
 
-        final UserNotFoundException getException = Assertions.assertThrows(
-                UserNotFoundException.class,
+        final NotFoundException getException = Assertions.assertThrows(
+                NotFoundException.class,
                 () -> userService.get(1L)
         );
 

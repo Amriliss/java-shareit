@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.practicum.shareit.exception.ItemRequestNotFoundException;
-import ru.practicum.shareit.exception.PaginationException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
@@ -80,7 +78,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void throwUserNotFoundException() {
+    void throwNotFoundException() {
         when(userRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
@@ -88,21 +86,21 @@ class ItemRequestServiceImplTest {
                 .description("description")
                 .build();
 
-        UserNotFoundException invalidUserIdException;
+        NotFoundException invalidUserIdException;
 
-        invalidUserIdException = Assertions.assertThrows(UserNotFoundException.class,
+        invalidUserIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemRequestService.create(2L, requestDto));
         assertThat(invalidUserIdException.getMessage(), is("user not found"));
 
-        invalidUserIdException = Assertions.assertThrows(UserNotFoundException.class,
+        invalidUserIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemRequestService.get(2L));
         assertThat(invalidUserIdException.getMessage(), is("user not found"));
 
-        invalidUserIdException = Assertions.assertThrows(UserNotFoundException.class,
-                () -> itemRequestService.get(2L, 0L, 10L));
+        invalidUserIdException = Assertions.assertThrows(NotFoundException.class,
+                () -> itemRequestService.get(2L, 0, 10));
         assertThat(invalidUserIdException.getMessage(), is("user not found"));
 
-        invalidUserIdException = Assertions.assertThrows(UserNotFoundException.class,
+        invalidUserIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemRequestService.get(2L, 1L));
         assertThat(invalidUserIdException.getMessage(), is("user not found"));
     }
@@ -203,7 +201,7 @@ class ItemRequestServiceImplTest {
 
         when(itemRequestRepository.findAllByRequesterIdIsNot(any(), any()))
                 .thenReturn(itemRequests);
-        List<ItemRequestDto> itemRequestDtos = itemRequestService.get(1L, 0L, 10L);
+        List<ItemRequestDto> itemRequestDtos = itemRequestService.get(1L, 0, 10);
         assertTrue(itemRequestDtos.isEmpty());
 
         itemRequests = List.of(request);
@@ -214,7 +212,7 @@ class ItemRequestServiceImplTest {
         when(itemRepository.findAllByRequestIdIn(List.of(1L)))
                 .thenReturn(items);
 
-        itemRequestDtos = itemRequestService.get(1L, 0L, 10L);
+        itemRequestDtos = itemRequestService.get(1L, 0, 10);
         assertTrue(itemRequestDtos.get(0).getItems().isEmpty());
 
         Item item = Item.builder()
@@ -230,30 +228,8 @@ class ItemRequestServiceImplTest {
         when(itemRepository.findAllByRequestIdIn(List.of(1L)))
                 .thenReturn(items);
 
-        itemRequestDtos = itemRequestService.get(1L, 0L, 10L);
+        itemRequestDtos = itemRequestService.get(1L, 0, 10);
         assertThat(itemRequestDtos, is(notNullValue()));
-    }
-
-    @Test
-    void throwPaginationException() {
-        User owner = User.builder()
-                .id(1L)
-                .name("name1")
-                .email("user1@email.com")
-                .build();
-
-        when(userRepository.findById(1L))
-                .thenReturn(Optional.of(owner));
-
-        PaginationException invalidPageParamsException;
-
-        invalidPageParamsException = Assertions.assertThrows(PaginationException.class,
-                () -> itemRequestService.get(1L, -1L, 10L));
-        assertThat(invalidPageParamsException.getMessage(), is("paging invalid"));
-
-        invalidPageParamsException = Assertions.assertThrows(PaginationException.class,
-                () -> itemRequestService.get(1L, 0L, 0L));
-        assertThat(invalidPageParamsException.getMessage(), is("paging invalid"));
     }
 
     @Test
@@ -318,7 +294,7 @@ class ItemRequestServiceImplTest {
         when(itemRequestRepository.findItemRequestById(any()))
                 .thenReturn(Optional.empty());
 
-        ItemRequestNotFoundException invalidItemRequestIdException = Assertions.assertThrows(ItemRequestNotFoundException.class,
+        NotFoundException invalidItemRequestIdException = Assertions.assertThrows(NotFoundException.class,
                 () -> itemRequestService.get(1L, 1L));
         assertThat(invalidItemRequestIdException.getMessage(), is("request not found"));
     }

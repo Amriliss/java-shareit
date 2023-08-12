@@ -113,7 +113,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> get(Long userId, Integer from, Integer size) {
         User owner = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
 
-        PageRequest pageRequest = PageRequest.of(from.intValue() / size.intValue(), size.intValue());
+        PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Item> repoItems = itemRepository.findAllByOwnerId(userId, pageRequest);
 
         List<ItemDto> itemDtoList = repoItems.stream()
@@ -122,12 +122,6 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
 
         for (ItemDto itemDto : itemDtoList) {
-
-            List<Comment> commentList = commentRepository.findAllByItemId(itemDto.getId());
-            List<CommentDto> commentDtos = commentList.stream()
-                    .map(CommentMapper::toCommentDto)
-                    .collect(Collectors.toList());
-            itemDto.setComments(commentDtos);
 
             Sort sortDesc = Sort.by(Sort.Direction.DESC, "end");
             Optional<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndStartIsBeforeAndStatusIs(

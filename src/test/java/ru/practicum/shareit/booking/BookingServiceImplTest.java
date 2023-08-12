@@ -13,7 +13,10 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
-import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.exception.InvalidDateTimeException;
+import ru.practicum.shareit.exception.InvalidStatusException;
+import ru.practicum.shareit.exception.NotAvailableExceptionBooking;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -339,13 +342,13 @@ class BookingServiceImplTest {
         when(bookingRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
-        BookingNotFoundException bookingNotFoundException;
+        NotFoundException bookingNotFoundException;
 
-        bookingNotFoundException = Assertions.assertThrows(BookingNotFoundException.class,
+        bookingNotFoundException = Assertions.assertThrows(NotFoundException.class,
                 () -> bookingService.approve(1L, 1L, true));
         assertThat(bookingNotFoundException.getMessage(), is("booking not found"));
 
-        bookingNotFoundException = Assertions.assertThrows(BookingNotFoundException.class,
+        bookingNotFoundException = Assertions.assertThrows(NotFoundException.class,
                 () -> bookingService.get(1L, 1L));
         assertThat(bookingNotFoundException.getMessage(), is("booking not found"));
     }

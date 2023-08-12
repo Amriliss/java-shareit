@@ -12,6 +12,8 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.Marker;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
@@ -19,6 +21,7 @@ import java.util.List;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class ItemController {
 
     private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
@@ -46,8 +49,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> get(@RequestHeader(X_SHARER_USER_ID) Long userId,
-                             @RequestParam(defaultValue = "0") Integer from,
-                             @RequestParam(defaultValue = "10") Integer size) {
+                             @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                             @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Получение всех вещей");
         return itemService.get(userId, from, size);
     }
@@ -55,8 +58,8 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> search(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                 @RequestParam String text,
-                                @RequestParam(defaultValue = "0") Integer from,
-                                @RequestParam(defaultValue = "10") Integer size
+                                @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                @RequestParam(defaultValue = "10") @Positive Integer size
     ) {
         log.info("Поиск вещи");
         return itemService.search(userId, text, from, size);

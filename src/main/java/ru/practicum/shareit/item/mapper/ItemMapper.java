@@ -1,15 +1,20 @@
 package ru.practicum.shareit.item.mapper;
 
+import ru.practicum.shareit.comment.dto.CommentDto;
+import ru.practicum.shareit.comment.mapper.CommentMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.requests.model.ItemRequest;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ItemMapper {
 
     public static ItemDto toItemDto(Item item) {
+        List<CommentDto> comments = getCommentDtos(item);
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -18,7 +23,7 @@ public class ItemMapper {
                 .requestId(Optional.ofNullable(item.getRequest()).map(ItemRequest::getId).orElse(null))
                 .lastBooking(null)
                 .nextBooking(null)
-                .comments(Collections.emptyList())
+                .comments(comments)
                 .build();
     }
 
@@ -42,5 +47,15 @@ public class ItemMapper {
                 .request(itemDto.getRequestId() == null ?
                         item.getRequest() : ItemRequest.builder().id(itemDto.getRequestId()).build())
                 .build();
+    }
+
+    private static List<CommentDto> getCommentDtos(Item item) {
+        if (item.getComments() == null) {
+            return new ArrayList<>();
+        }
+        return item.getComments()
+                .stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList());
     }
 }

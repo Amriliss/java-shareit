@@ -12,7 +12,10 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.exception.InvalidDateTimeException;
+import ru.practicum.shareit.exception.InvalidStatusException;
+import ru.practicum.shareit.exception.NotAvailableExceptionBooking;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.requests.pagerequestmanager.PageRequestManager;
@@ -68,7 +71,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingInfoDto approve(Long userId, Long bookingId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new BookingNotFoundException("booking not found"));
+                .orElseThrow(() -> new NotFoundException("booking not found"));
         Item item = booking.getItem();
         if (isUserIsOwner(userId, item)) {
             throw new NotFoundException("user not found");
@@ -84,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingInfoDto get(Long userId, Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new BookingNotFoundException("booking not found"));
+                .orElseThrow(() -> new NotFoundException("booking not found"));
         Item item = booking.getItem();
         if (isUserIsOwner(userId, item) && !userId.equals(booking.getBooker().getId())) {
             throw new NotFoundException("user not found");
@@ -98,8 +101,7 @@ public class BookingServiceImpl implements BookingService {
         StrategyName strategyName = StrategyName.valueOf(state.name());
         User booker = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
         List<Booking> bookings = new ArrayList<>();
-        PageRequest pageReq = PageRequestManager.form(
-                from, size, Sort.Direction.DESC, "start");
+        PageRequest pageReq = PageRequestManager.form(from, size, Sort.Direction.DESC, "start");
         BookingStateFetchStrategy strategyForBooker = strategyFactoryForBooker.findStrategy(strategyName);
         bookings = strategyForBooker.fetch(userId, pageReq);
         return bookings.isEmpty() ? Collections.emptyList() : bookings.stream()
@@ -113,8 +115,7 @@ public class BookingServiceImpl implements BookingService {
         StrategyName strategyName = StrategyName.valueOf(state.name());
         User owner = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
         List<Booking> bookings = new ArrayList<>();
-        PageRequest pageReq = PageRequestManager.form(
-                from, size, Sort.Direction.DESC, "start");
+        PageRequest pageReq = PageRequestManager.form(from, size, Sort.Direction.DESC, "start");
         BookingStateFetchStrategy strategyForOwner = strategyFactoryForOwner.findStrategy(strategyName);
         bookings = strategyForOwner.fetch(userId, pageReq);
         return bookings.isEmpty() ? Collections.emptyList() : bookings.stream()

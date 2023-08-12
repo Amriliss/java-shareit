@@ -266,23 +266,21 @@ class ItemServiceImplTest {
                 .email("user3@email.com")
                 .build();
 
+        LocalDateTime created = LocalDateTime.now();
+        Comment comment = Comment.builder()
+                .id(1L)
+                .text("text")
+                .author(booker)
+                .created(created)
+                .build();
         Item item = Item.builder()
                 .id(1L)
                 .name("name")
                 .description("description")
                 .available(true)
                 .owner(owner)
+                .comments(List.of(comment))
                 .build();
-
-        LocalDateTime created = LocalDateTime.now();
-        Comment comment = Comment.builder()
-                .id(1L)
-                .text("text")
-                .item(item)
-                .author(booker)
-                .created(created)
-                .build();
-        List<Comment> commentList = List.of(comment);
 
         ItemDto itemDto;
 
@@ -312,9 +310,6 @@ class ItemServiceImplTest {
 
         when(itemRepository.findById(1L))
                 .thenReturn(Optional.of(item));
-
-        when(commentRepository.findAllByItemId(1L))
-                .thenReturn(commentList);
 
         itemDto = itemService.get(1L, 1L);
         assertThat(itemDto, is(notNullValue()));
@@ -358,12 +353,20 @@ class ItemServiceImplTest {
         List<ItemDto> itemDtos = itemService.get(2L, 0, 10);
         Assertions.assertTrue(itemDtos.isEmpty());
 
+        LocalDateTime created = LocalDateTime.now();
+        Comment comment = Comment.builder()
+                .id(1L)
+                .text("text")
+                .author(booker)
+                .created(created)
+                .build();
         Item item = Item.builder()
                 .id(1L)
                 .name("name")
                 .description("description")
                 .available(true)
                 .owner(owner)
+                .comments(List.of(comment))
                 .build();
 
         List<Item> items = new ArrayList<>();
@@ -372,18 +375,6 @@ class ItemServiceImplTest {
         when(itemRepository.findAllByOwnerId(any(), any()))
                 .thenReturn(items);
 
-        LocalDateTime created = LocalDateTime.now();
-        Comment comment = Comment.builder()
-                .id(1L)
-                .text("text")
-                .item(item)
-                .author(booker)
-                .created(created)
-                .build();
-        List<Comment> commentList = List.of(comment);
-
-        when(commentRepository.findAllByItemId(1L))
-                .thenReturn(commentList);
 
         Booking lastBooking = Booking.builder()
                 .id(1L)

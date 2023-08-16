@@ -12,6 +12,8 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.Marker;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
@@ -19,15 +21,13 @@ import java.util.List;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Slf4j
-
+@Validated
 public class ItemController {
 
     private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
 
     private final ItemService itemService;
-
     private final CommentService commentService;
-
 
     @PostMapping
     public ItemDto create(@RequestHeader(X_SHARER_USER_ID) Long userId, @Validated(Marker.OnCreate.class) @RequestBody ItemDto itemDto) {
@@ -35,13 +35,11 @@ public class ItemController {
         return itemService.create(userId, itemDto);
     }
 
-
     @PatchMapping("/{itemId}")
     public ItemDto update(@RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
         log.info("Обновление данных вещи");
         return itemService.update(userId, itemId, itemDto);
     }
-
 
     @GetMapping("/{itemId}")
     public ItemDto get(@RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long itemId) {
@@ -49,23 +47,29 @@ public class ItemController {
         return itemService.get(userId, itemId);
     }
 
-
     @GetMapping
-    public List<ItemDto> get(@RequestHeader(X_SHARER_USER_ID) Long userId) {
+    public List<ItemDto> get(@RequestHeader(X_SHARER_USER_ID) Long userId,
+                             @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                             @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Получение всех вещей");
-        return itemService.get(userId);
+        return itemService.get(userId, from, size);
     }
 
-
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestHeader(X_SHARER_USER_ID) Long userId, @RequestParam String text) {
+    public List<ItemDto> search(@RequestHeader(X_SHARER_USER_ID) Long userId,
+                                @RequestParam String text,
+                                @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                @RequestParam(defaultValue = "10") @Positive Integer size
+    ) {
         log.info("Поиск вещи");
-        return itemService.search(userId, text);
+        return itemService.search(userId, text, from, size);
     }
 
     @Transactional
     @PostMapping("/{itemId}/comment")
-    public CommentDto comment(@RequestHeader(X_SHARER_USER_ID) Long userId, @PathVariable Long itemId, @Valid @RequestBody CommentDto commentDto) {
+    public CommentDto comment(@RequestHeader(X_SHARER_USER_ID) Long userId,
+                              @PathVariable Long itemId,
+                              @Valid @RequestBody CommentDto commentDto) {
         log.info("Добавление комментария");
         return commentService.comment(userId, itemId, commentDto);
     }

@@ -2,7 +2,6 @@ package ru.practicum.shareit.user.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserInfoDto;
 import ru.practicum.shareit.user.model.User;
 
 import javax.annotation.processing.Generated;
@@ -15,18 +14,7 @@ import javax.annotation.processing.Generated;
 @Component
 public class UserMapperImpl implements UserMapper {
 
-    @Override
-    public UserInfoDto toUserInfoDto(User user) {
-        if (user == null) {
-            return null;
-        }
 
-        UserInfoDto.UserInfoDtoBuilder userInfoDto = UserInfoDto.builder();
-
-        userInfoDto.id(user.getId());
-
-        return userInfoDto.build();
-    }
 
     @Override
     public UserDto toUserDto(User user) {

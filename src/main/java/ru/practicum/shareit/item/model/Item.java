@@ -1,12 +1,15 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.comment.model.Comment;
+import ru.practicum.shareit.requests.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -42,6 +45,10 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "request_id")
     private ItemRequest request;
+
+    @OneToMany
+    @JoinColumn(name = "item_id")
+    private List<Comment> comments = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

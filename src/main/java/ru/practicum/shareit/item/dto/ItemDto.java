@@ -32,16 +32,16 @@ public class ItemDto {
     private String description;
 
     @NotNull(groups = {Marker.OnCreate.class})
+
     private Boolean available;
 
     private Long owner;
 
-    private Long request;
+    private Long requestId;
 
     private LastBookingDto lastBooking;
 
     private NextBookingDto nextBooking;
 
     private List<CommentDto> comments;
-
 }

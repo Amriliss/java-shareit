@@ -1,6 +1,7 @@
 package ru.practicum.shareit.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -12,23 +13,23 @@ public class ErrorHandlerGeneral {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handlerValidationException(final ValidationException exception) {
+    public ErrorResponse handlerValidationException(ValidationException exception) {
         log.warn("409 {}", exception.getMessage());
         return new ErrorResponse("Validation error 409", exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handlerNotFoundException(final ObjectNotFoundException exception) {
+    public ErrorResponse handlerNotFoundException(ObjectNotFoundException exception) {
         log.warn("404 {}", exception.getMessage());
         return new ErrorResponse("Object not found 404", exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlerInvalidException(InvalidException exception) {
-        log.info("400 {}", exception.getMessage());
-        return new ErrorResponse("Invalid status 400", exception.getMessage());
+    public ErrorResponse handlerInvalidStatusException(InvalidStatusException exception) {
+        log.warn("400 {}", exception.getMessage());
+        return new ErrorResponse(exception.getMessage(), "Invalid status 400");
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -40,7 +41,7 @@ public class ErrorHandlerGeneral {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handlerDuplicateException(final DuplicateEmailException exception) {
+    public ErrorResponse handlerDuplicateException(DuplicateEmailException exception) {
         log.warn("409 {}", exception.getMessage());
         return new ErrorResponse("DuplicateEmailException error 409", exception.getMessage());
     }

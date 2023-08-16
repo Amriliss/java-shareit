@@ -4,6 +4,7 @@ package ru.practicum.shareit.comment.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -11,14 +12,12 @@ import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.mapper.CommentMapper;
 import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.comment.repository.CommentRepository;
-import ru.practicum.shareit.item.exception.InvalidCommentException;
-import ru.practicum.shareit.item.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.InvalidCommentException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,8 +36,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentDto comment(Long userId, Long itemId, CommentDto commentDto) {
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("item not found"));
-        User author = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("user not found"));
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("item not found"));
+        User author = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
         Sort sortDesc = Sort.by(Sort.Direction.DESC, "end");
         Booking booking = bookingRepository.findTop1BookingByItemIdAndBookerIdAndEndIsBeforeAndStatusIs(
                 itemId, userId, LocalDateTime.now(), Status.APPROVED, sortDesc).orElseThrow(

@@ -48,7 +48,7 @@ public class BookingGateway {
 
     @GetMapping
     public ResponseEntity<Object> getBookings(@RequestHeader(X_SHARER_USER_ID) Long userId,
-                                    @RequestParam(defaultValue = "ALL", required = false) State state,
+                                    @RequestParam(defaultValue = "ALL", required = false) String state,
                                     @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
                                     @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Получение всей брони");
@@ -57,7 +57,7 @@ public class BookingGateway {
 
     @GetMapping("/owner")
     public ResponseEntity<Object> getByOwner(@RequestHeader(X_SHARER_USER_ID) Long userId,
-                                           @RequestParam(defaultValue = "ALL", required = false) State state,
+                                           @RequestParam(defaultValue = "ALL", required = false) String state,
                                            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
                                            @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Получение брони по владельцу", userId);

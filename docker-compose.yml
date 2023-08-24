@@ -12,10 +12,11 @@ services:
       - server
       - db
     environment:
+      - TZ=Europe/Moscow
       - SHAREIT_SERVER_URL=http://server:9090
 
   server:
-    build: server/shareit-server-business
+    build: server
     image: server
     container_name: server_container
     ports:
@@ -23,6 +24,8 @@ services:
     depends_on:
       - db
     environment:
+      - TZ=Europe/Moscow
+      - SPRING_DATASOURCE_DRIVERCLASSNAME=org.postgresql.Driver
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
       - SPRING_DATASOURCE_USERNAME=shareit
       - SPRING_DATASOURCE_PASSWORD=shareit
@@ -33,6 +36,7 @@ services:
     ports:
       - "6541:5432"
     environment:
+      - TZ=Europe/Moscow
       - POSTGRES_DB=shareit
       - POSTGRES_USER=shareit
       - POSTGRES_PASSWORD=shareit

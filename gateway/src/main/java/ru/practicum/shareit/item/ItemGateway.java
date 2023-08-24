@@ -3,11 +3,9 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.comment.dto.CommentDto;
-
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.Marker;
 
@@ -66,7 +64,6 @@ public class ItemGateway {
         return itemClient.search(userId, text, from, size);
     }
 
-    @Transactional
     @PostMapping("/{itemId}/comment")
     public  ResponseEntity<Object> comment(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                            @PathVariable Long itemId,

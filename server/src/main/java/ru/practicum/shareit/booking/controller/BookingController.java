@@ -8,9 +8,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+
 import java.util.List;
 
 @RestController
@@ -25,7 +23,8 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingInfoDto create(@RequestHeader(X_SHARER_USER_ID) Long userId, @Valid @RequestBody BookingDto bookingDto) {
+    public BookingInfoDto create(@RequestHeader(X_SHARER_USER_ID) Long userId,
+                                 @RequestBody BookingDto bookingDto) {
         log.info("Добавление брони", userId);
         return bookingService.create(userId, bookingDto);
     }
@@ -47,8 +46,8 @@ public class BookingController {
     @GetMapping
     public List<BookingInfoDto> get(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                     @RequestParam(defaultValue = "ALL", required = false) String state,
-                                    @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                                    @RequestParam(defaultValue = "10") @Positive Integer size) {
+                                    @RequestParam(defaultValue = "0")  Integer from,
+                                    @RequestParam(defaultValue = "10")  Integer size) {
         log.info("Получение всей брони");
         return bookingService.get(userId, state, from, size);
     }
@@ -56,8 +55,8 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingInfoDto> getByOwner(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                            @RequestParam(defaultValue = "ALL", required = false) String state,
-                                           @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-                                           @RequestParam(defaultValue = "10") @Positive Integer size) {
+                                           @RequestParam(defaultValue = "0")  Integer from,
+                                           @RequestParam(defaultValue = "10")  Integer size) {
         log.info("Получение брони по владельцу", userId);
         return bookingService.getByOwner(userId, state, from, size);
     }

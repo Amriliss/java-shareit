@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.requests.service.ItemRequestService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+
 import java.util.List;
 
 @RestController
@@ -23,7 +21,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ItemRequestDto create(@RequestHeader(X_SHARER_USER_ID) Long userId,
-                                 @Valid @RequestBody ItemRequestDto itemRequestDto) {
+                                 @RequestBody ItemRequestDto itemRequestDto) {
         return itemRequestService.create(userId, itemRequestDto);
     }
 
@@ -35,8 +33,8 @@ public class ItemRequestController {
     @GetMapping("/all")
     public List<ItemRequestDto> get(
             @RequestHeader(X_SHARER_USER_ID) Long userId,
-            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-            @RequestParam(defaultValue = "10") @Positive Integer size
+            @RequestParam(defaultValue = "0")  Integer from,
+            @RequestParam(defaultValue = "10")  Integer size
     ) {
         return itemRequestService.get(userId, from, size);
     }
